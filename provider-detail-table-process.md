@@ -21,7 +21,90 @@ This document outlines the process of building the provider detail table, includ
 
 ## Pictorial Diagram
 
-![Provider Detail Table Building Process](<link_to_your_diagram>)
+                       START
+                         │
+                         ▼
+     ┌───────────────────────────────────┐
+     │    STEP 1: ANALYZE PROVIDERS      │
+     │         IN-SCOPE                  │
+     └───────────────────────────────────┘
+                         │
+     ┌───────────────────┴───────────────────┐
+     │                                       │
+     ▼                                       ▼
+┌──────────────────┐          ┌──────────────────────┐
+│ 1.1: SELECT      │          │ 1.2: UNSELECT        │
+│ Providers by:     │          │ Older files &        │
+│ • ID             │          │ Keep only:            │
+│ • bus_nm/npi_    │          │ • New files          │
+│   name           │          │                      │
+└────────┬─────────┘          └─────────┬────────────┘
+         │                               │
+         └───────────────┬───────────────┘
+                         │
+                         ▼
+     ┌───────────────────────────────────┐
+     │   STEP 2: QUERY NPI REF TABLE     │
+     │   & ADD TO CLIENT-SPECIFIC TABLE  │
+     └───────────────────────────────────┘
+                         │
+     ┌───────────────────┴───────────────────────────┐
+     │                                               │
+     │        Apply Filtering Criteria:             │
+     │        ✓ Active ind = TRUE                   │
+     │        ✓ NPI type = Organization             │
+     │        ✓ Org CCN id ≠ NULL                   │
+     │                                               │
+     ▼                                               ▼
+┌──────────────────┐          ┌──────────────────────┐
+│ Hospital Files   │          │ Payer Source IDs     │
+│ NPI Details      │          │ (Append same         │
+│ Populated        │          │  details)            │
+└────────┬─────────┘          └─────────┬────────────┘
+         │                               │
+         └───────────────┬───────────────┘
+                         │
+                         ▼
+     ┌───────────────────────────────────┐
+     │   STEP 3: HANDLE UNMATCHED         │
+     │   ENTRIES (Remove Hard Filters)   │
+     │   - Be Liberal with Criteria      │
+     │   - Retrieve Correct NPI Details  │
+     └───────────────┬───────────────────┘
+                     │
+                     ▼
+     ┌───────────────────────────────────┐
+     │   STEP 4: MATCH BY ADDRESS        │
+     │   (Lone Entries without bus_nm)   │
+     │                                   │
+     │   • Use hospital file address     │
+     │   • Find correct entry match      │
+     │   • Prioritize Hospital Files     │
+     │     first, then Payer             │
+     └───────────────┬───────────────────┘
+                     │
+                     ▼
+     ┌───────────────────────────────────┐
+     │   STEP 5: HANDLE PAYER ORPHANS    │
+     │                                   │
+     │   • Find npi_name in final        │
+     │     extract (source_id = payer)   │
+     │   • NPI details NOT in table      │
+     │     from steps 2-4                │
+     │   • Apply Name Grouping/Swapping  │
+     │   • Add remaining entries         │
+     └───────────────┬───────────────────┘
+                     │
+                     ▼
+     ┌───────────────────────────────────┐
+     │   CLIENT-SPECIFIC TABLE COMPLETE  │
+     │   ✓ All Provider Details          │
+     │   ✓ All NPI Mappings              │
+     │   ✓ All Source IDs Populated      │
+     └───────────────┬───────────────────┘
+                     │
+                     ▼
+                    END
 
 This diagram illustrates the above steps and helps to provide a visual understanding of the process flow.  
 Once completed, the client-specific table should be ready for implementation and use by the designated team.
