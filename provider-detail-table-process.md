@@ -21,6 +21,12 @@ This document outlines the process of building the provider detail table, includ
 
 ## Pictorial Diagram
 
+
+
+
+
+
+
                        START
                          │
                          ▼
@@ -105,6 +111,38 @@ This document outlines the process of building the provider detail table, includ
                      │
                      ▼
                     END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    
 
 This diagram illustrates the above steps and helps to provide a visual understanding of the process flow.  
 Once completed, the client-specific table should be ready for implementation and use by the designated team.
